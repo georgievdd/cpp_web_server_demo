@@ -1,8 +1,9 @@
 # Базовый образ с C++ инструментами
 FROM ubuntu:22.04 AS builder
 
-# Установка зависимостей
-RUN apt-get update && \
+# Установка зависимостей с использованием зеркала
+RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
+    apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     cmake \
@@ -19,9 +20,9 @@ COPY deps.txt Makefile ./
 # Установка зависимостей из deps.txt
 RUN mkdir -p libs && \
     while IFS= read -r repo; do \
-        repo_name="$$(basename "$$repo" .git)"; \
-        echo "Cloning $$repo_name..."; \
-        git clone --depth 1 "$$repo" "libs/$$repo_name"; \
+        repo_name=$(basename "$repo" .git); \
+        echo "Cloning $repo_name..."; \
+        git clone --depth 1 "$repo" "libs/$repo_name"; \
     done < deps.txt
 
 # Копирование остальных исходников
@@ -33,8 +34,9 @@ RUN make compile
 # Финальный образ
 FROM ubuntu:22.04
 
-# Установка runtime зависимостей
-RUN apt-get update && \
+# Используем зеркало для установки runtime зависимостей
+RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
+    apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libboost-system1.74 \
     libboost-thread1.74 \
