@@ -31,7 +31,7 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     libboost-thread1.74 \
     libatomic1
 
-COPY --from=builder /app /app
+COPY --from=builder /app/build/enrtypoint /app/entrypoint
 
 WORKDIR /app
 EXPOSE 8086
