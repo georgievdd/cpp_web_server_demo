@@ -7,7 +7,8 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     cmake \
     git \
     libboost-all-dev \
-    tree
+    tree \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -20,12 +21,9 @@ RUN mkdir -p libs && \
 COPY . .
 
 # Выводим структуру /app перед сборкой
-RUN echo "Структура папки /app:" && \
-    tree -L 3 /app && \  # Показываем структуру с глубиной 3 уровня
-    echo "\nСодержимое libs/Crow/include:" && \
-    ls -la /app/libs/Crow/include && \
-    echo "\nСодержимое libs/asio/include:" && \
-    ls -la /app/libs/asio/include
+RUN echo "Структура папки /app:" && tree -L 3 /app
+RUN echo "\nСодержимое libs/Crow/include:" && ls -la /app/libs/Crow/include
+RUN echo "\nСодержимое libs/asio/include:" && ls -la /app/libs/asio/include
 
 RUN make compile
 
