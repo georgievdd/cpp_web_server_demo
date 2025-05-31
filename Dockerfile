@@ -32,6 +32,7 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     libatomic1
 
 COPY --from=builder /app/build/enrtypoint /app/entrypoint
+COPY --from=builder /app/public /app/public
 
 WORKDIR /app
 EXPOSE 8086
