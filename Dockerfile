@@ -1,7 +1,5 @@
-# Базовый образ с C++ инструментами
 FROM ubuntu:22.04 AS builder
 
-# Установка зависимостей с использованием зеркала
 RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -11,30 +9,21 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     libboost-all-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Рабочая директория
 WORKDIR /app
 
-# Копирование только необходимых файлов для установки зависимостей
 COPY deps.txt Makefile ./
 
-# Установка зависимостей из deps.txt
 RUN mkdir -p libs && \
-    while IFS= read -r repo; do \
-        repo_name=$(basename "$repo" .git); \
-        echo "Cloning $repo_name..."; \
-        git clone --depth 1 "$repo" "libs/$repo_name"; \
-    done < deps.txt
+    git clone --depth 1 https://github.com/CrowCpp/Crow.git libs/crow && \
+    git clone --depth 1 https://github.com/boostorg/asio.git libs/asio && \
+    ln -s /app/libs/asio/asio/include/asio.hpp /app/libs/asio/include/asio.hpp
 
-# Копирование остальных исходников
 COPY . .
 
-# Сборка проекта
 RUN make compile
 
-# Финальный образ
 FROM ubuntu:22.04
 
-# Используем зеркало для установки runtime зависимостей
 RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -43,17 +32,12 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     libatomic1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование бинарника из стадии сборки
 COPY --from=builder /app/build/entrypoint /app/entrypoint
 
-# Копирование статических файлов
 COPY --from=builder /app/public /app/public
 
-# Рабочая директория
 WORKDIR /app
 
-# Порт сервера
-EXPOSE 8080
+EXPOSE 8086
 
-# Команда запуска
 CMD ["./entrypoint"]
