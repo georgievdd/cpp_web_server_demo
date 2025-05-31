@@ -15,7 +15,7 @@ COPY deps.txt Makefile ./
 
 RUN mkdir -p libs && \
     git clone https://github.com/CrowCpp/Crow.git libs/crow && \
-    git clone https://github.com/boostorg/asio.git libs/asio &&
+    git clone https://github.com/boostorg/asio.git libs/asio
 
 COPY . .
 
