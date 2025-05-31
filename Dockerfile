@@ -7,8 +7,7 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     cmake \
     git \
     libboost-all-dev \
-    tree \  # Устанавливаем утилиту tree для красивого вывода структуры
-    && rm -rf /var/lib/apt/lists/*
+    tree
 
 WORKDIR /app
 
