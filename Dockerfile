@@ -7,6 +7,7 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     cmake \
     git \
     libboost-all-dev \
+    tree \  # Устанавливаем утилиту tree для красивого вывода структуры
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -18,6 +19,14 @@ RUN mkdir -p libs && \
     git clone https://github.com/boostorg/asio.git libs/asio
 
 COPY . .
+
+# Выводим структуру /app перед сборкой
+RUN echo "Структура папки /app:" && \
+    tree -L 3 /app && \  # Показываем структуру с глубиной 3 уровня
+    echo "\nСодержимое libs/Crow/include:" && \
+    ls -la /app/libs/Crow/include && \
+    echo "\nСодержимое libs/asio/include:" && \
+    ls -la /app/libs/asio/include
 
 RUN make compile
 
@@ -32,11 +41,8 @@ RUN sed -i 's/archive.ubuntu.com/mirror.yandex.ru/g' /etc/apt/sources.list && \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/build/entrypoint /app/entrypoint
-
 COPY --from=builder /app/public /app/public
 
 WORKDIR /app
-
 EXPOSE 8086
-
 CMD ["./entrypoint"]
