@@ -14,9 +14,8 @@ WORKDIR /app
 COPY deps.txt Makefile ./
 
 RUN mkdir -p libs && \
-    git clone --depth 1 https://github.com/CrowCpp/Crow.git libs/crow && \
-    git clone --depth 1 https://github.com/boostorg/asio.git libs/asio && \
-    ln -s /app/libs/asio/asio/include/asio.hpp /app/libs/asio/include/asio.hpp
+    git clone https://github.com/CrowCpp/Crow.git libs/crow && \
+    git clone https://github.com/boostorg/asio.git libs/asio &&
 
 COPY . .
 
