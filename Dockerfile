@@ -16,16 +16,19 @@ COPY deps.txt Makefile ./
 
 RUN mkdir -p libs && \
     git clone https://github.com/CrowCpp/Crow.git libs/Crow && \
-    git clone https://github.com/boostorg/asio.git libs/asio
+    git clone https://github.com/chriskohlhoff/asio.git libs/asio && \
+    # Создаем символическую ссылку для правильного пути
+    ln -s /app/libs/asio/asio/include /app/libs/asio/include
 
 COPY . .
 
-# Выводим структуру /app перед сборкой
-RUN echo "Структура папки /app:" && tree -L 3 /app
-RUN echo "\nСодержимое libs/Crow/include:" && ls -la /app/libs/Crow/include
-RUN echo "\nСодержимое libs/asio/include:" && ls -la /app/libs/asio/include
+# Проверяем структуру
+RUN echo "Проверка структуры:" && \
+    ls -la /app/libs/Crow/include/crow.h && \
+    ls -la /app/libs/asio/include/asio.hpp
 
-RUN make compile
+# Собираем с явным указанием путей
+RUN make CROW_INC="-I/app/libs/Crow/include" ASIO_INC="-I/app/libs/asio/include" compile
 
 FROM ubuntu:22.04
 
